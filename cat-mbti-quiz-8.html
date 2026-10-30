@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e9eff9">
+<title>你是哪种猫格 MBTI</title>
+<style>
+  :root{
+    --bg:#e9eff9;
+    --card:#ffffff;
+    --ink:#22304a;
+    --ink2:#57647c;
+    --muted:#8b98ae;
+    --line:#dbe4f2;
+    --blue:#6c8cff;
+    --blue2:#4f6ef2;
+    --blue3:#4058c9;
+    --pink:#ff9fbe;
+    --pink2:#f56a95;
+    --pink3:#d94e79;
+    --mint:#68d6c3;
+    --cream:#fff8ee;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0}
+  body{
+    background:
+      radial-gradient(760px 520px at 50% -8%, #ffffff 0%, rgba(255,255,255,0) 60%),
+      radial-gradient(620px 480px at 8% 22%, rgba(176,199,255,.45) 0%, rgba(176,199,255,0) 65%),
+      radial-gradient(560px 440px at 96% 62%, rgba(255,190,214,.38) 0%, rgba(255,190,214,0) 68%),
+      linear-gradient(180deg, #eef3fb 0%, #e3ebf7 60%, #dfe7f4 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+    font-size:16px; line-height:1.75; -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:contain;
+  }
+  [hidden]{display:none !important}
+  button{font-family:inherit; font-size:inherit; color:inherit; border:none; background:none; cursor:pointer; touch-action:manipulation}
+  .app{max-width:520px; margin:0 auto; position:relative; z-index:1; min-height:100vh; min-height:100svh; padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom))}
+  .screen{display:flex; flex-direction:column; min-height:calc(100vh - 36px); min-height:calc(100svh - 36px)}
+  .mono{font-family:"SFMono-Regular","Menlo","Consolas","Courier New",monospace}
+
+  /* 立体卡片 */
+  .panel{
+    border-radius:28px; padding:26px 22px;
+    background:linear-gradient(180deg,#ffffff 0%, #f8fbff 62%, #f1f6ff 100%);
+    box-shadow:
+      0 30px 54px -30px rgba(40,66,116,.45),
+      0 14px 24px -20px rgba(40,66,116,.35),
+      0 1px 0 #ffffff inset,
+      0 -2px 0 rgba(40,66,116,.05) inset;
+    position:relative;
+  }
+  .kicker{font-size:10px; letter-spacing:.28em; color:var(--blue2); font-weight:800}
+
+  /* ---------- 封面 ---------- */
+  .cover-body{flex:1; display:flex; flex-direction:column; justify-content:center; padding:6px 0 2px}
+  .cat-wrap{display:flex; align-items:center; gap:6px; margin:8px 0 2px}
+  .cat{width:132px; height:132px; flex:none; animation:floaty 4.6s ease-in-out infinite}
+  .cat-sm{width:104px; height:104px}
+  .cat-xs{width:64px; height:64px}
+  @keyframes floaty{
+    0%,100%{transform:translateY(0) rotate(-1deg)}
+    50%{transform:translateY(-8px) rotate(1.5deg)}
+  }
+  .cat-bubble{
+    position:relative; font-size:13px; font-weight:800; color:var(--ink);
+    background:linear-gradient(180deg,#fff,#f4f8ff); padding:8px 14px; border-radius:16px;
+    box-shadow:0 5px 0 #e2eaf8, 0 12px 20px -14px rgba(40,66,116,.4), 0 1px 0 #fff inset;
+    transform:rotate(-3deg); line-height:1.5;
+  }
+  .title{
+    font-size:clamp(34px, 10.5vw, 46px); line-height:1.14; font-weight:900; letter-spacing:-1.2px;
+    margin:10px 0 10px;
+    color:var(--ink);
+    text-shadow:0 2px 0 #d6e1f5, 0 10px 24px rgba(40,66,116,.18);
+  }
+  .title em{font-style:normal; color:var(--blue2)}
+  .sub{font-size:15px; font-weight:800; color:var(--blue2); margin:0 0 14px; letter-spacing:.04em}
+  .desc{font-size:14px; color:var(--ink2); margin:0 0 18px; line-height:1.95}
+  .facts{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px}
+  .fact{
+    font-size:11.5px; color:var(--ink2); font-weight:700;
+    padding:7px 13px; border-radius:14px;
+    background:linear-gradient(180deg,#fff,#f3f7ff);
+    box-shadow:0 4px 0 #e3eaf7, 0 8px 14px -12px rgba(40,66,116,.4), 0 1px 0 #fff inset;
+  }
+  .fact b{color:var(--blue2); font-weight:900}
+
+  /* 立体按钮 */
+  .btn{
+    display:flex; align-items:center; justify-content:center; width:100%; min-height:60px;
+    font-size:16px; font-weight:900; letter-spacing:.08em; border-radius:20px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-main{
+    background:linear-gradient(180deg,#8fa6ff 0%, var(--blue2) 62%, #4460e0 100%);
+    color:#fff;
+    box-shadow:0 8px 0 var(--blue3), 0 20px 30px -14px rgba(64,88,201,.6), 0 2px 0 rgba(255,255,255,.5) inset;
+  }
+  .btn-main:active{transform:translateY(6px); box-shadow:0 2px 0 var(--blue3), 0 10px 18px -12px rgba(64,88,201,.55), 0 2px 0 rgba(255,255,255,.5) inset}
+  .btn-soft{
+    background:linear-gradient(180deg,#ffffff,#f2f7ff); color:var(--ink);
+    box-shadow:0 6px 0 #dfe8f7, 0 14px 22px -16px rgba(40,66,116,.45), 0 1px 0 #fff inset;
+  }
+  .btn-soft:active{transform:translateY(4px); box-shadow:0 2px 0 #dfe8f7, 0 6px 12px -10px rgba(40,66,116,.4), 0 1px 0 #fff inset}
+  .cover-note{font-size:11.5px; color:var(--muted); text-align:center; margin:14px 0 0; line-height:1.9}
+
+  /* ---------- 答题 ---------- */
+  .qbar{
+    position:sticky; top:0; z-index:6;
+    padding:8px 4px 12px;
+    background:linear-gradient(180deg, rgba(238,243,251,.96), rgba(238,243,251,.72) 72%, rgba(238,243,251,0));
+    backdrop-filter:blur(8px);
+  }
+  .qbar-row{display:flex; align-items:center; gap:10px}
+  .iconbtn{
+    width:42px; height:42px; border-radius:15px; font-size:20px; font-weight:800; color:var(--blue2);
+    background:linear-gradient(180deg,#fff,#f1f6ff);
+    box-shadow:0 5px 0 #dfe8f7, 0 10px 16px -12px rgba(40,66,116,.5), 0 1px 0 #fff inset;
+  }
+  .iconbtn:active{transform:translateY(3px); box-shadow:0 2px 0 #dfe8f7}
+  .iconbtn:disabled{opacity:.35; box-shadow:none}
+  .qmeta{flex:1}
+  .qcount{display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:8px}
+  .qcount b{color:var(--blue2)}
+  .track{
+    height:12px; border-radius:99px; overflow:hidden;
+    background:linear-gradient(180deg,#e4ebf8,#eef3fb);
+    box-shadow:inset 0 3px 6px rgba(40,66,116,.18), inset 0 -1px 0 #fff;
+  }
+  .track i{
+    display:block; height:100%; width:0; border-radius:99px;
+    background:linear-gradient(180deg,#9db4ff,#6c8cff 55%,#5a76ea);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.65), 0 0 12px rgba(108,140,255,.5);
+    transition:width .34s cubic-bezier(.4,.1,.2,1);
+  }
+  .qbody{flex:1; padding:14px 4px 4px; display:flex; flex-direction:column}
+  .qaxis{
+    display:inline-flex; align-self:flex-start; font-size:11px; font-weight:900; letter-spacing:.12em;
+    color:#fff; padding:5px 12px; border-radius:12px; margin-bottom:14px;
+    background:linear-gradient(180deg,#a9bdff,#6c8cff);
+    box-shadow:0 4px 0 #4b63cf, 0 8px 14px -10px rgba(64,88,201,.6), 0 1px 0 rgba(255,255,255,.5) inset;
+  }
+  .qtext{font-size:21px; line-height:1.55; font-weight:800; letter-spacing:-.2px; margin:0 0 8px}
+  .hint{font-size:12px; color:var(--muted); margin:0 0 20px; line-height:1.7}
+  .opts{display:flex; flex-direction:column; gap:12px}
+  .opt{
+    text-align:left; font-size:14.5px; line-height:1.7; min-height:64px; padding:16px 17px;
+    display:flex; align-items:center; gap:12px;
+    border-radius:20px;
+    background:linear-gradient(180deg,#ffffff 0%, #f6f9ff 70%, #eef4ff 100%);
+    box-shadow:0 6px 0 #e1e9f7, 0 14px 22px -16px rgba(40,66,116,.45), 0 1px 0 #fff inset;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .opt:active{transform:translateY(5px); box-shadow:0 1px 0 #e1e9f7, 0 6px 12px -10px rgba(40,66,116,.4)}
+  .opt .dot{
+    width:22px; height:22px; border-radius:50%; flex:none;
+    background:linear-gradient(180deg,#dbe5f6,#c8d5ec);
+    box-shadow:inset 0 2px 3px rgba(40,66,116,.25), inset 0 -1px 0 #fff;
+    transition:background .15s;
+  }
+  .opt.on{
+    background:linear-gradient(180deg,#eef4ff,#e2ebff);
+    box-shadow:0 6px 0 #c3d3f2, 0 0 0 2px rgba(108,140,255,.35) inset, 0 14px 22px -14px rgba(64,88,201,.5);
+  }
+  .opt.on .dot{background:linear-gradient(180deg,#a4bbff,#5a76ea); box-shadow:inset 0 2px 0 rgba(255,255,255,.6), 0 2px 6px rgba(64,88,201,.4)}
+  .qfoot{margin-top:auto; padding-top:18px; font-size:11.5px; color:var(--muted); text-align:center}
+
+  /* ---------- 加载 ---------- */
+  #loading{
+    position:fixed; inset:0; z-index:50; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px;
+    background:radial-gradient(600px 500px at 50% 38%, #ffffff 0%, #e9eff9 55%, #dfe7f4 100%);
+  }
+  #loading .cat{width:120px; height:120px; animation:pop 1.1s ease-in-out infinite}
+  @keyframes pop{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
+  #loading p{font-size:12.5px; color:var(--ink2); font-weight:700; letter-spacing:.12em}
+  .load-letters{display:flex; gap:6px; margin-top:2px}
+  .load-letters span{
+    font-size:11px; font-weight:900; color:#fff; padding:3px 8px; border-radius:10px;
+    background:linear-gradient(180deg,#a9bdff,#6c8cff);
+    box-shadow:0 3px 0 #4b63cf, 0 1px 0 rgba(255,255,255,.5) inset;
+  }
+
+  /* ---------- 结果 ---------- */
+  .r-kicker{font-size:10px; letter-spacing:.26em; color:var(--blue2); font-weight:800; text-align:center; margin-bottom:10px}
+  .r-hero{text-align:center; padding-bottom:8px}
+  .r-cat{font-size:26px; font-weight:900; letter-spacing:-.5px; margin:6px 0 2px}
+  .r-title{font-size:15px; font-weight:800; color:var(--blue2); margin:0 0 4px}
+  .r-tagline{font-size:13px; color:var(--muted); margin:0 0 18px; line-height:1.8}
+  .letters{display:flex; justify-content:center; gap:10px; margin:4px 0 16px; flex-wrap:wrap}
+  .letter{
+    width:62px; height:78px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+    font-size:36px; font-weight:900; color:#fff; letter-spacing:0;
+    background:linear-gradient(180deg,#9db4ff 0%, #6c8cff 55%, #5a76ea 100%);
+    box-shadow:0 8px 0 #4b63cf, 0 18px 26px -14px rgba(64,88,201,.6), 0 2px 0 rgba(255,255,255,.55) inset;
+  }
+  .letter:nth-child(2n){
+    background:linear-gradient(180deg,#ffbfd5 0%, #ff9fbe 55%, #f77ba4 100%);
+    box-shadow:0 8px 0 #d95e83, 0 18px 26px -14px rgba(217,94,131,.6), 0 2px 0 rgba(255,255,255,.55) inset;
+  }
+  .axis-row{margin-bottom:14px}
+  .axis-top{display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:var(--ink2); margin-bottom:6px}
+  .axis-top span b{color:var(--blue2); font-size:13px}
+  .axis-track{
+    height:14px; border-radius:99px; overflow:hidden;
+    background:linear-gradient(180deg,#e3eaf8,#eff4fc);
+    box-shadow:inset 0 3px 6px rgba(40,66,116,.18), inset 0 -1px 0 #fff;
+  }
+  .axis-track i{
+    display:block; height:100%; border-radius:99px;
+    background:linear-gradient(180deg,#ffc3d7,#ff8fb4 60%,#f77ba4);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.7);
+  }
+  .axis-why{font-size:11.5px; color:var(--muted); margin:6px 0 0; line-height:1.7}
+  .block{
+    margin-top:14px; border-radius:20px; padding:18px 18px;
+    background:linear-gradient(180deg,#ffffff,#f7faff);
+    box-shadow:0 6px 0 #e6ecf8, 0 14px 22px -18px rgba(40,66,116,.4), 0 1px 0 #fff inset;
+  }
+  .block h3{margin:0 0 10px; font-size:11px; letter-spacing:.16em; color:var(--blue2); font-weight:900}
+  .block p{margin:0; font-size:14px; line-height:2; color:var(--ink2)}
+  .block .quote{font-size:15px; font-weight:800; color:var(--ink); line-height:1.85}
+  .tips{margin:0; padding:0; list-style:none}
+  .tips li{
+    font-size:13.5px; line-height:1.8; color:var(--ink2); position:relative;
+    padding-left:26px; margin-bottom:9px;
+  }
+  .tips li::before{
+    content:""; position:absolute; left:2px; top:7px; width:10px; height:10px; border-radius:50%;
+    background:linear-gradient(180deg,#a4bbff,#5a76ea); box-shadow:0 2px 0 #4b63cf, 0 1px 0 rgba(255,255,255,.6) inset;
+  }
+  .egg{background:linear-gradient(180deg,#fffaf2,#fff4e4); box-shadow:0 6px 0 #f2e3cd, 0 14px 22px -18px rgba(120,90,30,.3), 0 1px 0 #fff inset}
+  .egg h3{color:#c8892f}
+  .warn{background:linear-gradient(180deg,#f6f9ff,#eef4ff)}
+  .warn p{font-size:12.5px; color:var(--muted)}
+  .r-actions{margin-top:16px; display:flex; flex-direction:column; gap:12px}
+  .r-foot{margin-top:14px; text-align:center; font-size:11px; color:var(--muted); line-height:1.9}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 立体猫 sprite -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;overflow:hidden">
+    <symbol id="clay-cat" viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="furG" cx="34%" cy="24%" r="86%">
+          <stop offset="0" stop-color="#ffffff"/>
+          <stop offset="52%" stop-color="#f0f4fd"/>
+          <stop offset="100%" stop-color="#c6d4ee"/>
+        </radialGradient>
+        <radialGradient id="earG" cx="42%" cy="18%" r="82%">
+          <stop offset="0" stop-color="#ffffff"/>
+          <stop offset="100%" stop-color="#d3dff5"/>
+        </radialGradient>
+        <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#a6d0ff"/>
+          <stop offset="55%" stop-color="#4f7fe0"/>
+          <stop offset="100%" stop-color="#2b4796"/>
+        </linearGradient>
+        <radialGradient id="noseG" cx="38%" cy="28%" r="76%">
+          <stop offset="0" stop-color="#ffd0de"/>
+          <stop offset="100%" stop-color="#f27497"/>
+        </radialGradient>
+        <radialGradient id="blushG" cx="50%" cy="50%" r="60%">
+          <stop offset="0" stop-color="#ffb6cb" stop-opacity=".85"/>
+          <stop offset="100%" stop-color="#ffb6cb" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="100" cy="174" rx="56" ry="12" fill="#b7c8e6" opacity=".5"/>
+      <ellipse cx="100" cy="148" rx="50" ry="39" fill="url(#furG)"/>
+      <path d="M50 64 L58 16 L98 44 Z" fill="url(#earG)"/>
+      <path d="M150 64 L142 16 L102 44 Z" fill="url(#earG)"/>
+      <path d="M60 57 L65 31 L86 47 Z" fill="#ffc2d6" opacity=".9"/>
+      <path d="M140 57 L135 31 L114 47 Z" fill="#ffc2d6" opacity=".9"/>
+      <circle cx="100" cy="92" r="56" fill="url(#furG)"/>
+      <ellipse cx="74" cy="66" rx="30" ry="20" fill="#ffffff" opacity=".62" transform="rotate(-18 74 66)"/>
+      <ellipse cx="100" cy="146" rx="22" ry="12" fill="#ffffff" opacity=".55"/>
+      <circle cx="80" cy="94" r="19" fill="#ffffff"/>
+      <circle cx="120" cy="94" r="19" fill="#ffffff"/>
+      <circle cx="82" cy="96" r="13" fill="url(#eyeG)"/>
+      <circle cx="118" cy="96" r="13" fill="url(#eyeG)"/>
+      <circle cx="77" cy="90" r="4.6" fill="#ffffff"/>
+      <circle cx="113" cy="90" r="4.6" fill="#ffffff"/>
+      <path d="M93 114 L107 114 L100 123 Z" fill="url(#noseG)"/>
+      <path d="M100 123 C100 130 91 132 87 127" stroke="#8b9ab5" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M100 123 C100 130 109 132 113 127" stroke="#8b9ab5" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="61" cy="110" rx="13" ry="8" fill="url(#blushG)"/>
+      <ellipse cx="139" cy="110" rx="13" ry="8" fill="url(#blushG)"/>
+    </symbol>
+  </svg>
+
+  <!-- 封面 -->
+  <section id="s-cover" class="screen">
+    <div class="panel" style="flex:1; display:flex; flex-direction:column">
+      <div class="kicker mono">FELINE.PROFILE / MBTI 16</div>
+      <div class="cover-body">
+        <div class="cat-wrap">
+          <svg class="cat" viewBox="0 0 200 200" aria-hidden="true"><use href="#clay-cat" width="200" height="200"/></svg>
+          <div class="cat-bubble">你是<br>哪只猫？</div>
+        </div>
+        <h1 class="title">你是哪种<br><em>猫格 MBTI</em></h1>
+        <p class="sub">十六型人格，十六只猫。</p>
+        <p class="desc">8 道速测题，E/I、S/N、T/F、J/P 每个维度 2 题，快速给你配一只猫。</p>
+        <div class="facts">
+          <span class="fact"><b>8</b> 题</span>
+          <span class="fact"><b>16</b> 型猫设</span>
+          <span class="fact">约 <b>1</b> 分钟</span>
+        </div>
+        <button class="btn btn-main" id="btn-start">开始测猫格</button>
+        <p class="cover-note">娱乐向内容 · MBTI 只是描述偏好，不是判决书<br>你比四个字母更复杂</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 答题 -->
+  <section id="s-quiz" class="screen" hidden>
+    <div class="qbar">
+      <div class="qbar-row">
+        <button class="iconbtn" id="btn-prev" aria-label="上一题">‹</button>
+        <div class="qmeta">
+          <div class="qcount"><b id="qno">第 1 题</b><span id="qtotal">/ 8 题</span></div>
+          <div class="track"><i id="pfill"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="qbody">
+      <span class="qaxis mono" id="qaxis">E / I</span>
+      <h2 class="qtext" id="qtext"></h2>
+      <p class="hint" id="qhint"></p>
+      <div class="opts" id="qopts"></div>
+      <div class="qfoot">选你真实会做的，不是你觉得应该做的</div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section id="s-result" class="screen" hidden>
+    <div class="r-kicker mono">CAT PROFILE READY</div>
+    <div class="panel">
+      <div class="r-hero">
+        <svg class="cat cat-sm" viewBox="0 0 200 200" aria-hidden="true"><use href="#clay-cat" width="200" height="200"/></svg>
+        <div class="r-cat" id="r-cat"></div>
+        <div class="r-title" id="r-title"></div>
+        <p class="r-tagline" id="r-tagline"></p>
+        <div class="letters" id="r-letters"></div>
+      </div>
+      <div id="r-axes"></div>
+      <div class="block"><h3>为什么是这四个字母</h3><div id="r-why"></div></div>
+      <div class="block"><h3>你的猫设</h3><p id="r-desc"></p></div>
+      <div class="block"><h3>养自己指南</h3><ul class="tips" id="r-tips"></ul></div>
+      <div class="block egg" id="r-egg-block"><h3>猫格彩蛋</h3><p id="r-egg"></p></div>
+      <div class="block warn"><h3>提醒</h3><p>MBTI 描述的是偏好，不是能力，也不是命运。四个字母只说明你在某些场景下更省力，不说明你不能做别的事。这份报告仅供娱乐，别拿它限制自己。</p></div>
+      <div class="r-actions">
+        <button class="btn btn-main" id="btn-share">复制分享文案</button>
+        <button class="btn btn-soft" id="btn-quick">想看完整版 · 18 题深度扫描</button>
+        <button class="btn btn-soft" id="btn-restart">重新测一次</button>
+      </div>
+      <div class="r-foot">你是哪种猫格 MBTI<br>娱乐向内容 · 十六只猫，没有一只是错的</div>
+    </div>
+  </section>
+
+  <!-- 加载 -->
+  <div id="loading" hidden>
+    <svg class="cat" viewBox="0 0 200 200" aria-hidden="true"><use href="#clay-cat" width="200" height="200"/></svg>
+    <p>正在给你的猫格打版…</p>
+    <div class="load-letters"><span>E</span><span>I</span><span>S</span><span>N</span><span>T</span><span>F</span><span>J</span><span>P</span></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CONFIG = { total: 8, fullUrl: "cat-mbti-quiz.html" };
+
+  var AXES = {
+    ei:{left:"E", right:"I", ln:"撒欢", rn:"省电",
+        whyL:"你在人群里充电，越热闹越有电。",
+        whyR:"你在安静里充电，人一多就掉电。"},
+    sn:{left:"S", right:"N", ln:"踩点", rn:"脑补",
+        whyL:"你先看现实，再谈可能。",
+        whyR:"你先想可能，再看现实。"},
+    tf:{left:"T", right:"F", ln:"冷判", rn:"共情",
+        whyL:"你先判断对不对，再照顾心情。",
+        whyR:"你先照顾心情，再判断对不对。"},
+    jp:{left:"J", right:"P", ln:"计划", rn:"随缘",
+        whyL:"你先定好路线，再出门。",
+        whyR:"你先出门，路线路上再说。"}
+  };
+
+  // 每个维度 4 题，2 分制；x 为不计分彩蛋题
+  var QUESTIONS = [
+    {axis:"ei", hint:"门铃是给谁按的，你心里有数。",
+     text:"门铃响了三声，你正在家。",
+     opts:[
+       {t:"直接冲过去看是谁", s:2},
+       {t:"先从猫眼确认，再决定开不开", s:1},
+       {t:"假装不在家，等它自己走", s:0}]},
+    {axis:"ei", hint:"两天完全空白，你会怎么填。",
+     text:"周末两天没有任何安排。",
+     opts:[
+       {t:"马上约人出去，闲着难受", s:2},
+       {t:"一天出门，一天在家躺着", s:1},
+       {t:"两天都不出门，爽到不想说话", s:0}]},
+
+    {axis:"sn", hint:"说明书是个诱人的东西。",
+     text:"你买了一个柜子，说明书在盒子里。",
+     opts:[
+       {t:"从第一步开始照着做", s:2},
+       {t:"扫一眼图，差不多就开始装", s:1},
+       {t:"先把零件摆一摆，看看能不能拼成别的", s:0}]},
+    {axis:"sn", hint:"导演故意没解释的那个镜头。",
+     text:"看完一部电影，有个镜头导演没解释。",
+     opts:[
+       {t:"觉得这镜头没必要", s:2},
+       {t:"记下来了，但没多想", s:1},
+       {t:"当晚查了三篇解析，还写了自己的理论", s:0}]},
+
+    {axis:"tf", hint:"眼泪先到，逻辑后到。",
+     text:"朋友哭着说被领导骂了。",
+     opts:[
+       {t:"先问清楚发生了什么，是不是流程问题", s:2},
+       {t:"陪着说那确实过分", s:1},
+       {t:"先递纸巾，什么也不分析", s:0}]},
+    {axis:"tf", hint:"方案被否的那一下。",
+     text:"你做的方案被否了。",
+     opts:[
+       {t:"复盘哪里不严谨，下次改", s:2},
+       {t:"有点不服，但接受了", s:1},
+       {t:"先难受半天，缓过来再做", s:0}]},
+
+    {axis:"jp", hint:"出门前的十分钟说明一切。",
+     text:"要出门旅行了。",
+     opts:[
+       {t:"列清单、订好每一程、留好备用方案", s:2},
+       {t:"机酒订好，其他现场看", s:1},
+       {t:"到了再说，反正能住就行", s:0}]},
+    {axis:"jp", hint:"提前三天做完，是一种病。",
+     text:"一件事做完了，截止日期还有三天。",
+     opts:[
+       {t:"立刻交付，拖着心里不安", s:2},
+       {t:"再检查一遍，然后交", s:1},
+       {t:"先放着，最后一天再交", s:0}]}
+  ];
+
+  var EGG_TALK = [
+    "「你今天已经很努力了。」",
+    "「该睡了。」",
+    "「我一直在看着你。」"
+  ];
+  var EGG_KIND = [
+    "你的猫像室友：各自安好，互不打扰。",
+    "你的猫像家人：互相依赖，谁晚归谁担心。",
+    "你的猫像同居的神秘生物：互不解释，但都懂。"
+  ];
+
+  var TYPES = {
+    ISTJ:{cat:"英短蓝猫", emoji:"🐈", title:"打卡机器", tagline:"你说的每句话都有出处。",
+      desc:"你的日常是一条被反复校准的轨道：几点喂猫、几点关灯、猫粮剩多少该补货，误差不超过十分钟。别人觉得你无趣，其实你只是把生活打理得没有漏洞。你的猫早就学会了你的作息，到点就坐在碗边等你。",
+      tips:["别把计划被打乱当成事故","允许自己有一个不解释的下午","偶尔让猫决定今天吃什么"]},
+    ISFJ:{cat:"异国短毛猫", emoji:"🐈", title:"贴身保姆", tagline:"先照顾别人，再想起自己。",
+      desc:"你记得每个人的忌口、每个人的生日，甚至记得同事上次咳嗽还没好。你不擅长表达需求，但你的关心全在细节里：猫窝晒过太阳、水碗换了新的、你朋友的伞还在你包里。",
+      tips:["把「我没事」换成「我有点累」","偶尔也让猫照顾你一次","试着拒绝一件小事"]},
+    INFJ:{cat:"暹罗猫", emoji:"🐈", title:"预言家", tagline:"你比当事人更早看见结局。",
+      desc:"你在人群里很安静，但脑子里一直在推演：这句话背后是什么、这段关系会走成什么样。你常常说中，也常常因此有点孤独。你的猫是唯一不觉得你想太多的生物。",
+      tips:["别替所有人提前难过","把预言说出口，别只在心里演","留一个不分析任何人的晚上"]},
+    INTJ:{cat:"缅因猫", emoji:"🐈", title:"冷面军师", tagline:"你已经想好了三步之后的棋。",
+      desc:"你不太解释自己，因为解释太慢。你在脑子里建模型、拆系统、找最优解，对无效社交和无效会议零容忍。你看上去冷淡，其实只是把所有温度留给了极少数人和一只猫。",
+      tips:["把结论说出来，别让人猜","允许方案里有「差不多」","偶尔听听没有逻辑的抱怨"]},
+    ISTP:{cat:"美短起司", emoji:"🐈", title:"冷面修理工", tagline:"别喊，我先看看它为什么坏。",
+      desc:"你话不多，动手很快。别人在群里焦虑，你已经把东西拆开、找到问题、装回去了。你不喜欢情绪讨论，喜欢能拧的螺丝和能验证的答案。你的猫摔了东西，你只问一句：几楼掉的。",
+      tips:["先回应情绪，再解决问题","偶尔说一句「我在」","别把沉默当成沟通"]},
+    ISFP:{cat:"银渐层", emoji:"🐈", title:"安静的艺术家", tagline:"你不解释，你只是好看地存在着。",
+      desc:"你对氛围极其敏感：光线的角度、杯子的手感、别人一句话里的重量。你不争不抢，但你的审美会悄悄改变一个房间。你的猫和你一样，挑位置、挑时间、挑心情。",
+      tips:["把喜欢说出口，别只做","允许自己被看见","别用「随便」掩盖真实偏好"]},
+    INFP:{cat:"三花猫", emoji:"🐈", title:"梦境诗人", tagline:"你在现实里租房，在心里盖楼。",
+      desc:"你的内心世界比外部世界大三倍，那里有没写完的故事、没寄出的信、没发生的重逢。你对世界温柔到有点吃亏，但你的柔软是有刺的，只是不轻易亮出来。",
+      tips:["把脑内的东西写下来，它会成真","难过的时候先说，不要先躲","允许自己不完美地完成一件事"]},
+    INTP:{cat:"斯芬克斯无毛猫", emoji:"🐈", title:"实验怪才", tagline:"这个问题有意思，我先查一下。",
+      desc:"你对「为什么」的兴趣远大于「怎么办」。你能为一个冷知识查两个小时，却对交水电费毫无热情。你不是冷漠，是注意力被更重要的问题占线了。你的猫早已习惯你半夜突然坐起来。",
+      tips:["给结论，不要只给分析","设一个必须完成的最小动作","记得回消息，那也是一道题"]},
+    ESTP:{cat:"孟加拉豹猫", emoji:"🐈", title:"肾上腺素", tagline:"先做，出事了再说。",
+      desc:"你反应快、胆子大，哪里有机会就往哪里扑。你讨厌冗长的会议和「我们再讨论一下」，你要的是现在、立刻、马上。你的生活很少无聊，偶尔也很惊险。",
+      tips:["冲之前先问一句代价是什么","把长期的事拆成今天能做的一步","别用刺激掩盖疲惫"]},
+    ESFP:{cat:"白猫", emoji:"🐈", title:"全场焦点", tagline:"我一进门，气氛就活了。",
+      desc:"你走到哪儿都自带背景音乐。你享受当下，擅长把普通的一天过成节日，也容易在热闹散去之后突然空掉。你的猫跟你一样，是全屋最会抢镜头的那只。",
+      tips:["允许自己有不发光的日子","把「以后再说」改成「现在就做」","难过时找人陪，不丢人"]},
+    ENFP:{cat:"奶牛猫", emoji:"🐈", title:"气氛组长", tagline:"我有个特别好的想法，还有十七个。",
+      desc:"你热情、好奇心旺盛，一天能冒出十个新计划，九个半没落地。你擅长把陌生人变成朋友，把无聊的场合变成故事。你的猫已经学会在你兴奋时躲到高处。",
+      tips:["一次只推进一个想法","把收尾也当成创作的一部分","别用新鲜感替代坚持"]},
+    ENTP:{cat:"阿比西尼亚猫", emoji:"🐈", title:"杠精运动员", tagline:"我不是抬杠，我在帮你验证。",
+      desc:"你喜欢把观点拆开、翻过来、再装回去。你跟人辩论不是为了赢，是为了看这个想法结不结实。你脑子快、话也快，偶尔会不小心把气氛点着。",
+      tips:["先确认对方想不想听建议","把「但是」换成「同时」","给一个想法真正做完的机会"]},
+    ESTJ:{cat:"狸花猫", emoji:"🐈", title:"项目总管", tagline:"这事我来，你们都别乱动。",
+      desc:"你天生带着流程感：谁负责什么、几点交付、出了问题找谁，你心里有一张表。你效率高、执行力强，也容易被当成凶。其实你只是受不了事情烂在那里。",
+      tips:["把「你应该」换成「要不要」","允许别人用更慢的方式做对","偶尔放下表格，陪猫躺十分钟"]},
+    ESFJ:{cat:"橘猫", emoji:"🐈", title:"社交中枢", tagline:"人齐了，才叫过日子。",
+      desc:"你是那个把所有人拉进群里的人：订餐厅、算人均、记得谁不吃香菜。你的能量来自热闹，也怕被落下。你的猫被你养得很会社交，见谁都翻肚皮。",
+      tips:["别人没回消息，不代表不喜欢你","给自己留一个不社交的晚上","允许关系里有安静期"]},
+    ENFJ:{cat:"布偶猫", emoji:"🐈", title:"人间暖炉", tagline:"你不用说话，我也知道你不舒服。",
+      desc:"你天生会照顾场子：谁被冷落了、谁在硬撑、谁需要被推一把，你都看得见。你把别人的成长当成自己的事，也常常忘记自己也需要被接住。",
+      tips:["把自己的需求排进日程","别替所有人负责","允许自己做得不完美"]},
+    ENTJ:{cat:"黑猫", emoji:"🐈", title:"独裁总裁", tagline:"目标定了，剩下的都是执行问题。",
+      desc:"你天生想赢，也天生会带着人赢。你敢做决定、敢担责任、敢在别人犹豫的时候拍板。你说话直接、效率极高，偶尔需要提醒自己：队友不是资源。",
+      tips:["决策前多问一句「你怎么想」","把强势换成明确","允许别人不按你的节奏走"]}
+  };
+
+  var idx = 0;
+  var answers = new Array(CONFIG.total).fill(null);
+  var last = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var coverEl = $("s-cover"), quizEl = $("s-quiz"), resultEl = $("s-result"), loadingEl = $("loading");
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function renderQ(){
+    var q = QUESTIONS[idx];
+    var A = AXES[q.axis];
+    $("qaxis").textContent = A ? (A.left + " / " + A.right) : "BONUS";
+    $("qno").textContent = "第 " + (idx+1) + " 题";
+    $("qtotal").textContent = "/ " + CONFIG.total + " 题";
+    $("pfill").style.width = (idx / CONFIG.total * 100) + "%";
+    $("qtext").textContent = q.text;
+    $("qhint").textContent = q.hint;
+    $("btn-prev").disabled = (idx === 0);
+
+    var box = $("qopts");
+    box.innerHTML = "";
+    shuffle(q.opts).forEach(function(o){
+      var b = document.createElement("button");
+      b.className = "opt" + (answers[idx] === o.s ? " on" : "");
+      b.innerHTML = '<span class="dot"></span><span>' + o.t + '</span>';
+      b.onclick = function(){
+        answers[idx] = o.s;
+        var all = box.querySelectorAll(".opt");
+        for(var k=0;k<all.length;k++) all[k].classList.remove("on");
+        b.classList.add("on");
+        setTimeout(function(){
+          if(idx < CONFIG.total-1){ idx++; renderQ(); window.scrollTo(0,0); }
+          else { finish(); }
+        }, 240);
+      };
+      box.appendChild(b);
+    });
+  }
+
+  function calc(){
+    var keys = ["ei","sn","tf","jp"];
+    var sums = {ei:0,sn:0,tf:0,jp:0}, counts = {ei:0,sn:0,tf:0,jp:0}, i, k;
+    for(i=0;i<QUESTIONS.length;i++){
+      var q = QUESTIONS[i];
+      if(!AXES[q.axis]) continue;
+      counts[q.axis]++;
+      sums[q.axis] += (answers[i] === null ? 1 : answers[i]);
+    }
+    var letters = "", axes = [];
+    for(k=0;k<4;k++){
+      var key = keys[k], A = AXES[key];
+      var need = Math.ceil(counts[key] * 1.25);
+      var isLeft = sums[key] >= need;
+      letters += isLeft ? A.left : A.right;
+      var pct = Math.round(sums[key] / (counts[key] * 2) * 100);
+      axes.push({
+        left:A.left, right:A.right, ln:A.ln, rn:A.rn,
+        leftPct:pct, rightPct:100-pct,
+        winner:isLeft ? "left" : "right",
+        why:isLeft ? A.whyL : A.whyR
+      });
+    }
+    var egg = null;
+    var talk = null, kind = null;
+    for(i=0;i<QUESTIONS.length;i++){
+      if(QUESTIONS[i].axis !== "x") continue;
+      if(talk === null) talk = answers[i];
+      else kind = answers[i];
+    }
+    if(talk !== null && kind !== null && talk !== undefined && kind !== undefined){
+      egg = "如果它会说话，它大概会说" + EGG_TALK[talk] + "；在你心里，它更像" + EGG_KIND[kind].replace(/^你的猫像/, "") + "";
+    }
+    return { letters:letters, type:TYPES[letters], axes:axes, egg:egg };
+  }
+
+  function renderResult(r){
+    var t = r.type;
+    $("r-cat").textContent = t.cat;
+    $("r-title").textContent = t.title;
+    $("r-tagline").textContent = t.tagline;
+    $("r-desc").textContent = t.desc;
+
+    var lb = $("r-letters");
+    lb.innerHTML = "";
+    for(var i=0;i<r.letters.length;i++){
+      var sp = document.createElement("span");
+      sp.className = "letter";
+      sp.textContent = r.letters.charAt(i);
+      lb.appendChild(sp);
+    }
+
+    var ax = $("r-axes");
+    ax.innerHTML = "";
+    r.axes.forEach(function(a){
+      var wrap = document.createElement("div");
+      wrap.className = "axis-row";
+      var leftName = a.winner === "left" ? a.left + " · " + a.ln : a.left;
+      var rightName = a.winner === "right" ? a.right + " · " + a.rn : a.right;
+      wrap.innerHTML =
+        '<div class="axis-top"><span><b>' + leftName + '</b> ' + a.leftPct + '%</span>' +
+        '<span>' + a.rightPct + '% <b>' + rightName + '</b></span></div>' +
+        '<div class="axis-track"><i style="width:' + a.leftPct + '%"></i></div>' +
+        '<p class="axis-why">' + a.why + '</p>';
+      ax.appendChild(wrap);
+    });
+
+    var why = $("r-why");
+    why.innerHTML = "";
+    r.axes.forEach(function(a){
+      var p = document.createElement("p");
+      p.className = "axis-why";
+      p.style.fontSize = "13px";
+      p.style.margin = "0 0 8px";
+      p.textContent = "· " + a.why;
+      why.appendChild(p);
+    });
+
+    var tl = $("r-tips");
+    tl.innerHTML = "";
+    t.tips.forEach(function(x){
+      var li = document.createElement("li");
+      li.textContent = x;
+      tl.appendChild(li);
+    });
+
+    var eggBlock = $("r-egg-block");
+    if(r.egg){
+      eggBlock.hidden = false;
+      $("r-egg").textContent = r.egg;
+    } else {
+      eggBlock.hidden = true;
+    }
+  }
+
+  function finish(){
+    quizEl.hidden = true;
+    loadingEl.hidden = false;
+    setTimeout(function(){
+      last = calc();
+      renderResult(last);
+      loadingEl.hidden = true;
+      resultEl.hidden = false;
+      window.scrollTo(0,0);
+    }, 1400);
+  }
+
+  $("btn-start").onclick = function(){
+    coverEl.hidden = true;
+    quizEl.hidden = false;
+    idx = 0;
+    answers = new Array(CONFIG.total).fill(null);
+    renderQ();
+    window.scrollTo(0,0);
+  };
+
+  $("btn-prev").onclick = function(){
+    if(idx > 0){ idx--; renderQ(); window.scrollTo(0,0); }
+  };
+
+  $("btn-restart").onclick = function(){
+    resultEl.hidden = true;
+    coverEl.hidden = false;
+    idx = 0;
+    answers = new Array(CONFIG.total).fill(null);
+    window.scrollTo(0,0);
+  };
+
+  $("btn-quick").onclick = function(){
+    location.href = CONFIG.fullUrl;
+  };
+
+  $("btn-share").onclick = function(){
+    if(!last) return;
+    var txt = "我的猫格是 " + last.letters + " · " + last.type.cat + "（" + last.type.title + "）——" + last.type.tagline + " 你是哪只猫？ " + location.href;
+    var btn = $("btn-share");
+    var done = function(){ btn.textContent = "已复制，去发给朋友"; setTimeout(function(){ btn.textContent = "复制分享文案"; }, 1800); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, function(){ alert(txt); });
+    } else { alert(txt); }
+  };
+})();
+</script>
+</body>
+</html>
